@@ -501,10 +501,15 @@ chmod +x ~/.local/bin/boot
 
 Make then system accessible
 #+begin_src sh :dir /sudo::
-sudo ln -s $(eval echo ~$USER)/.local/bin/setkbd /usr/local/bin/setkbd
-sudo ln -s $(eval echo ~$USER)/.local/bin/setbd /usr/local/bin/setbg
-sudo ln -s $(eval echo ~$USER)/.local/bin/docked /usr/local/bin/docked
-sudo ln -s $(eval echo ~$USER)/.local/bin/boot /usr/local/bin/boot
+sudo rm /usr/local/bin/setkbd
+sudo rm /usr/local/bin/setbg
+sudo rm /usr/local/bin/docked
+sudo rm /usr/local/bin/boot
+
+sudo ln -s /home/ulisses/.local/bin/setkbd /usr/local/bin/setkbd
+sudo ln -s /home/ulisses/.local/bin/setbg /usr/local/bin/setbg
+sudo ln -s /home/ulisses/.local/bin/docked /usr/local/bin/docked
+sudo ln -s /home/ulisses/.local/bin/boot /usr/local/bin/boot
 #+end_src
 
 ** DWM autostart
