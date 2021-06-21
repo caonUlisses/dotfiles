@@ -1,5 +1,4 @@
 #+TITLE: General configuration
-#+PROPERTY: header-args:emacs-lisp :tangle ~/.doom.d/config.el :mkdirp yes
 
 * Table of contents :toc:
 - [[#about][About]]
