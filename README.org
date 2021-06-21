@@ -23,7 +23,7 @@
   - [[#dwm-autostart][DWM autostart]]
 
 * About
-This single file set up a whole bunch of stuff, maily, emacs, some scripts and tools.
+This single file set up a whole bunch of stuff, mainly, emacs, some scripts and tools.
 
 * Doom Emacs
 
