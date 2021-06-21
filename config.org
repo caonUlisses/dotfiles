@@ -8,6 +8,13 @@
   - [[#interface][Interface]]
   - [[#org-mode][Org mode]]
   - [[#packages][Packages]]
+- [[#vim][VIM]]
+  - [[#plugins][Plugins]]
+  - [[#general-configuration][General configuration]]
+  - [[#keymaps][Keymaps]]
+  - [[#meta][Meta]]
+  - [[#cocvim-configuration][COC.vim configuration]]
+  - [[#initvim][init.vim]]
 - [[#scripts][Scripts]]
   - [[#setkbd][SetKBD]]
   - [[#setbg][SetBG]]
@@ -67,7 +74,7 @@ Maybe more than I actually need, but still...
 
        :completion
        company           ; the ultimate code completion backend
-       (ivy +fuzzy)               ; a search engine for love and life
+       ivy               ; a search engine for love and life
 
        :ui
        doom              ; what makes DOOM look the way it does
@@ -147,6 +154,287 @@ Maybe more than I actually need, but still...
        (default +bindings +smartparens))
 #+end_src
 
+
+* VIM
+** Plugins
+#+begin_src vimrc :tangle ~/.config/nvim/list.vim :mkdirp yes
+call plug#begin('~/.vim/plugged')
+
+" autocomplete
+Plug 'neoclide/coc.nvim', {'tag': '*', 'branch': 'release'}
+
+" editing
+" Plug 'mattn/emmet-vim'
+Plug 'AndrewRadev/tagalong.vim'
+Plug 'Chiel92/vim-autoformat'
+Plug 'alvan/vim-closetag'
+Plug 'cohama/lexima.vim'
+Plug 'frazrepo/vim-rainbow'
+Plug 'terryma/vim-multiple-cursors'
+Plug 'tpope/vim-surround'
+Plug 'junegunn/goyo.vim'
+Plug 'haya14busa/incsearch.vim'
+Plug 'tpope/vim-commentary'
+Plug 'AndrewRadev/splitjoin.vim'
+Plug 'gregsexton/MatchTag'
+
+" project
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+Plug 'tpope/vim-vinegar'
+Plug 'francoiscabrol/ranger.vim'
+Plug 'rhysd/git-messenger.vim'
+
+" docker
+Plug 'ekalinin/Dockerfile.vim'
+
+" status line
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+
+" snippets
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
+
+" git
+Plug 'airblade/vim-gitgutter'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-rhubarb'
+
+" php
+Plug 'dominikduda/vim_current_word'
+Plug 'adoy/vim-php-refactoring-toolbox'
+Plug 'noahfrederick/vim-composer'
+
+" terraform
+Plug 'hashivim/vim-terraform'
+
+" style
+Plug 'ryanoasis/vim-devicons'
+
+" sql
+Plug 'tpope/vim-dadbod'
+Plug 'joereynolds/SQHell.vim'
+
+" random
+Plug 'mhinz/vim-startify'
+" Plug 'bagrat/vim-buffet'
+Plug 'airblade/vim-rooter'
+
+call plug#end()
+
+#+end_src
+** General configuration
+#+begin_src vimrc :tangle ~/.config/nvim/general.vim :mkdirp yes
+" General Settings
+filetype plugin on
+set encoding=utf8    " enables UFT-8
+set autowriteall     " autosave file if vim exits
+set relativenumber   " set the line number indicator as relative to line is currently in
+set copyindent       " copy with indentation
+syntax on            " syntax highlight
+
+" Nice tabs
+set guioptions-=e
+
+" Spacing
+set expandtab             " turn tabs into spaces
+set tabstop=4             " each tab will have 2 spaces
+set shiftwidth=4          " identation for 2
+set number                " show numbers
+set smartindent           " make identation work
+set clipboard=unnamed     " fix clipboard identation
+set autoindent            " set autoindent for newlines
+set si
+filetype plugin indent on " fix autoindent based on filetype
+
+autocmd FileType json syntax match Comment +\/\/.\+$+
+
+#+end_src
+** Keymaps
+General keymaps for neovim
+#+begin_src vimrc :tangle ~/.config/nvim/keymaps.vim :mkdirp yes
+nnoremap <SPACE> <Nop>
+let mapleader=" "
+
+nnoremap <Leader>gb :Gblame<CR>  " git blame
+nmap <Leader>vpi :PlugInstall<cr>
+nmap <Leader>vpu :PlugUpdate<cr>
+nmap <Leader>vpc :PlugClean<cr> y <cr>
+
+" FZF
+nmap <Leader>p :ProjectFiles<cr>
+nmap <Leader>s :Lines<cr>
+nmap <Leader>f :Rg<cr>
+
+noremap <Leader><C-J> <C-W><C-J> :q <cr>
+noremap <Leader><C-H> <C-W><C-H> :q <cr>
+noremap <Leader><C-L> <C-W><C-L> :q <cr>
+noremap <Leader><C-K> <C-W><C-K> :q <cr>
+nnoremap ; :
+
+nnoremap gn :tabnew<cr>
+
+map /  <Plug>(incsearch-forward)
+map ?  <Plug>(incsearch-backward)
+map g/ <Plug>(incsearch-stay)
+
+#+end_src
+** Meta
+TODO: fix it for neovim
+#+begin_src vimrc :tangle ~/.config/nvim/meta.vim :mkdirp yes
+" Source vimrc file on save
+augroup autosourcing
+  autocmd!
+  autocmd BufWritePost .init.vim source %
+augroup END
+
+nmap <Leader>ev :tabedit $MYVIMRC<cr>
+#+end_src
+** COC.vim configuration
+Configure coc-vim for ease of use
+#+begin_src vimrc :tangle ~/.config/nvim/coc.vim :mkdirp yes
+" tab completion
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+if exists('*complete_info')
+  inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
+else
+  inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+endif
+
+" navigation
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" documentation
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
+
+" renaming
+nmap <leader>rn <Plug>(coc-rename)
+
+" Formatting selected code.
+xmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
+
+augroup mygroup
+  autocmd!
+  " Setup formatexpr specified filetype(s).
+  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+  " Update signature help on jump placeholder.
+  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+augroup end
+
+" Map function and class text objects
+" NOTE: Requires 'textDocument.documentSymbol' support from the language server.
+xmap if <Plug>(coc-funcobj-i)
+omap if <Plug>(coc-funcobj-i)
+xmap af <Plug>(coc-funcobj-a)
+omap af <Plug>(coc-funcobj-a)
+xmap ic <Plug>(coc-classobj-i)
+omap ic <Plug>(coc-classobj-i)
+xmap ac <Plug>(coc-classobj-a)
+omap ac <Plug>(coc-classobj-a)
+
+" Use CTRL-S for selections ranges.
+" Requires 'textDocument/selectionRange' support of LS, ex: coc-tsserver
+nmap <silent> <C-s> <Plug>(coc-range-select)
+xmap <silent> <C-s> <Plug>(coc-range-select)
+
+" Add `:Format` command to format current buffer.
+command! -nargs=0 Format :call CocAction('format')
+
+" Add `:Fold` command to fold current buffer.
+command! -nargs=? Fold :call     CocAction('fold', <f-args>)
+
+" Add `:OR` command for organize imports of the current buffer.
+command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
+
+" fix colors
+hi CocInfoFloat guifg=#202020 guibg=#303030
+
+" explore all things
+nmap <space>e :CocCommand explorer<CR>
+
+#+end_src
+** init.vim
+This file import the others and define some basic standards
+#+begin_src vimrc :tangle ~/.config/nvim/init.vim :mkdirp yes
+" external files
+source ~/.config/nvim/general.vim
+source ~/.config/nvim/list.vim
+source ~/.config/nvim/coc.vim
+source ~/.config/nvim/keymaps.vim
+source ~/.config/nvim/meta.vim
+
+" current word
+hi CurrentWord ctermfg=NONE ctermbg=NONE cterm=bold
+hi CurrentWordTwins ctermfg=NONE ctermbg=NONE cterm=underline
+
+" brackets
+let g:rainbow_active = 0
+
+" messages
+let g:git_messenger_close_on_cursor_moved=0
+
+" autoformat
+noremap <F3> :Autoformat<CR>
+
+" snippets
+let g:UltiSnipsExpandTrigger = "<nop>"
+
+" fzf
+function! s:find_git_root()
+  return system('git rev-parse --show-toplevel 2> /dev/null')[:-2]
+endfunction
+
+command! ProjectFiles execute 'Files' s:find_git_root()
+
+" ALE
+let g:ale_fixers = {'javascript': ['standard', 'standard'], 'ruby': ['rubocop'], 'eruby': ['ruumba'], 'haml': ['haml-lint']}
+
+let g:airline#extensions#ale#enabled = 1
+
+highlight ALEWarning ctermbg=DarkGreen
+highlight ALEWarning ctermfg=Black
+
+" Autoclose
+let g:closetag_filenames = '*.html.*,*.xhtml,*.phtml'
+
+" Eruby
+augroup twig_ft
+  au!
+  autocmd BufNewFile,BufRead *.html.erb   set syntax=eruby
+augroup END
+
+" Testing
+nmap <silent> t<C-n> :TestNearest<CR>
+nmap <silent> t<C-f> :TestFile<CR>
+nmap <silent> t<C-s> :TestSuite<CR>
+nmap <silent> t<C-l> :TestLast<CR>
+nmap <silent> t<C-g> :TestVisit<CR>
+
+colorscheme zellner
+
+#+end_src
 
 * Scripts
 
