@@ -21,9 +21,10 @@
   - [[#boot][Boot]]
   - [[#set-scripts-up][Set scripts up]]
   - [[#dwm-autostart][DWM autostart]]
+  - [[#random-image-generator][Random Image Generator]]
 
 * About
-This single file set up a whole bunch of stuff, mainly, emacs, some scripts and tools.
+This single file set up a whole bunch of stuff - mainly, emacs - some scripts and tools.
 
 * Doom Emacs
 
@@ -451,7 +452,7 @@ xcape -e 'Caps_Lock=Escape;Control_L=Escape;Control_R=Escape'
 
 ** SetBG
 I often keep the same wallpaper for a year or so. As I already use feh as an image viewer, being able to set a wallpeper with it makes a lot of sense.
-#+begin_src sh :tangle ~/.local/bin/setkbd :mkdirp yes
+#+begin_src sh :tangle ~/.local/bin/setbg :mkdirp yes
 #!/bin/bash
 
 feh --bg-scale /home/ulisses/img/wallpaper.jpg
@@ -459,11 +460,21 @@ feh --bg-scale /home/ulisses/img/wallpaper.jpg
 #+end_src
 
 ** Docked
-Everytime I dock/undock the thinkpad, I need to tell it which screens to use. There are a lot of ways to automate it, but I really enjoy being able to do it myself.
+Everytime I dock/undock my thinkpad, I need to tell it which screens to use. There are a lot of ways to automate it, but I really enjoy being able to do it myself.
 #+begin_src sh :tangle ~/.local/bin/docked :mkdirp yes
-#!/bin/sh
 
-xrandr --output LVDS-1 --primary --mode 1366x768 --pos 277x1080 --rotate normal --output VGA-1 --off --output HDMI-1 --off --output DP-1 --off --output HDMI-2 --off --output HDMI-3 --off --output DP-2 --mode 1920x1080 --pos 0x0 --rotate normal --output DP-3 --off
+#!/bin/bash
+
+isConnected=$(cat /sys/class/drm/card0-DP-2/status)
+connected="connected"
+
+if [ "$isConnected" == "$connected" ]; then
+        xrandr --output VGA-1 --off --output LVDS-1 --primary --mode 1366x768 --pos 306x1080 --rotate normal --output HDMI-3 --off --output HDMI-2 --off --output HDMI-1 --off --output DP-3 --off --output DP-2 --mode 1920x1080 --pos 0x0 --rotate normal --output DP-1 --off
+else
+        xrandr --output VGA-1 --off --output LVDS-1 --primary --mode 1366x768 --pos 0x0 --rotate normal --output HDMI-3 --off --output HDMI-2 --off --output HDMI-1 --off --output DP-3 --off --output DP-2 --off --output DP-1 --off
+
+fi
+
 #+end_src
 
 ** Boot
@@ -502,5 +513,42 @@ DWM has a patch that allows an autostart script to execute, I just run the boot 
 #!/bin/bash
 
 boot
+
+#+end_src
+
+** Random Image Generator
+I often need to upload test images when I'm working on a webapp. Profile pictures, galleries, attachments... This script was born so I'll never have to look for images again
+#+begin_src sh :tangle ~/.local/bin/rig :mkdirp yes
+#!/bin/bash
+i=1;
+
+die () {
+    echo >&2 "$@"
+    exit 1
+}
+
+echo $1 | grep -E -q '^[0-9]+$' || die "Tell me how many images you need"
+
+while [[ $i -le $1 ]]
+do
+  [[ $i -lt 10 ]] && a="0${i}" || a="$i"
+  FILE="${PWD}/${a}".jpg
+
+  if [ ! -f "$FILE" ]; then
+    convert -size 1920x1080 canvas:khaki  "${a}.jpg"
+  fi
+  w=$(identify -format '%w' $a.jpg)
+  h=$(identify -format '%h' $a.jpg)
+  w=$((w/2))
+  h=$((h/2))
+  convert -pointsize 90 -fill black -draw 'text '"$w"','"$h"' "'"$a"'"' "${a}".jpg "${a}".jpg
+  echo "Created image ${a}.jpg"
+  (( i = i + 1 ))
+done
+
+#+end_src
+
+#+begin_src sh
+chmod +x ~/.local/bin/rig
 
 #+end_src
