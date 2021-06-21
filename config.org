@@ -1,0 +1,219 @@
+#+TITLE: General configuration
+#+PROPERTY: header-args:emacs-lisp :tangle ~/.doom.d/config.el :mkdirp yes
+
+* Table of contents :toc:
+- [[#about][About]]
+- [[#doom-emacs][Doom Emacs]]
+  - [[#personal-information][Personal Information]]
+  - [[#interface][Interface]]
+  - [[#org-mode][Org mode]]
+  - [[#packages][Packages]]
+- [[#scripts][Scripts]]
+  - [[#setkbd][SetKBD]]
+  - [[#setbg][SetBG]]
+  - [[#docked][Docked]]
+  - [[#boot][Boot]]
+  - [[#set-scripts-up][Set scripts up]]
+  - [[#dwm-autostart][DWM autostart]]
+
+* About
+This single file set up a whole bunch of stuff, maily, emacs, some scripts and tools.
+
+* Doom Emacs
+
+** Personal Information
+My name and e-mail, so if I lost my computer, anyone could easely launch emacs, open this file and discover how to reach me.
+#+begin_src emacs-lisp :tangle ~/.doom.d/config.el :mkdirp yes
+(setq user-full-name "Ulisses Caon"
+    user-mail-address "ulissescaon@gmail.com")
+#+end_src
+
+** Interface
+Hack is a great font, it handles 0 and O like a champ! Also, look at that: '| L 1 l I i'! Awesome!
+I used to code with a 12pt font, but after some years on the road - working mostly with old systems, built by coworkers who don't give a crap about standards - I decided I needed more code on the screen. Also, got new glasses :neckbeard:.
+#+begin_src emacs-lisp :tangle ~/.doom.d/config.el :mkdirp yes
+(setq doom-font (font-spec :family "Hack Nerd Font" :size 11)
+      doom-variable-pitch-font (font-spec :family "sans" :size 11))
+#+end_src
+
+Gruvbox is the best theme I've seen so far. I know dark themes are sexy and all, but I had too much eyestrain using dark themes. I like to work on a well lit room, so light themes end up being easier on my eyes.
+#+begin_src emacs-lisp :tangle ~/.doom.d/config.el :mkdirp yes
+(setq doom-theme 'doom-gruvbox-light)
+#+end_src
+
+Line numbers are really cool if you use vim/evil. 8j 12k v22j... Life changer
+#+begin_src emacs-lisp :tangle ~/.doom.d/config.el :mkdirp yes
+(setq display-line-numbers-type t)
+(setq doom-line-numbers-style 'relative)
+#+end_src
+
+Transparency helps me visualize the awesome wallpapers I have.
+#+begin_src emacs-lisp :tangle ~/.doom.d/config.el :mkdirp yes
+(set-frame-parameter (selected-frame) 'alpha '(85 85))
+(add-to-list 'default-frame-alist '(alpha 85 85))
+#+end_src
+
+** Org mode
+Default org mode directory
+#+begin_src emacs-lisp :tangle ~/.doom.d/config.el :mkdirp yes
+(setq org-directory "~/org/")
+#+end_src
+
+** Packages
+Maybe more than I actually need, but still...
+#+begin_src emacs-lisp :tangle ~/.doom.d/init.el :mkdirp yes
+;;; init.el -*- lexical-binding: t; -*-
+(doom! :input
+
+       :completion
+       company           ; the ultimate code completion backend
+       (ivy +fuzzy)               ; a search engine for love and life
+
+       :ui
+       doom              ; what makes DOOM look the way it does
+       doom-dashboard    ; a nifty splash screen for Emacs
+       doom-quit         ; DOOM quit-message prompts when you quit Emacs
+       (emoji +unicode)  ; 🙂
+       hl-todo           ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
+       ligatures         ; ligatures and symbols to make your code pretty again
+       modeline          ; snazzy, Atom-inspired modeline, plus API
+       neotree           ; a project drawer, like NERDTree for vim
+       ophints           ; highlight the region an operation acts on
+       (popup +defaults)   ; tame sudden yet inevitable temporary windows
+       tabs              ; a tab bar for Emacs
+       unicode           ; extended unicode support for various languages
+       vc-gutter         ; vcs diff in the fringe
+       vi-tilde-fringe   ; fringe tildes to mark beyond EOB
+       window-select     ; visually switch windows
+       workspaces        ; tab emulation, persistence & separate workspaces
+       zen               ; distraction-free coding or writing
+
+       :editor
+       (evil +everywhere); come to the dark side, we have cookies
+       file-templates    ; auto-snippets for empty files
+       fold              ; (nigh) universal code folding
+       multiple-cursors  ; editing in many places at once
+       rotate-text       ; cycle region at point between text candidates
+       snippets          ; my elves. They type so I don't have to
+       word-wrap         ; soft wrapping with language-aware indent
+
+       :emacs
+       dired             ; making dired pretty [functional]
+       electric          ; smarter, keyword-based electric-indent
+       undo              ; persistent, smarter undo for your inevitable mistakes
+       vc                ; version-control and Emacs, sitting in a tree
+
+       :term
+       eshell            ; the elisp shell that works everywhere
+       vterm             ; the best terminal emulation in Emacs
+
+       :checkers
+       syntax              ; tasing you for every semicolon you forget
+
+       :tools
+       debugger          ; FIXME stepping through code, to help you add bugs
+       docker
+       (eval +overlay)     ; run code, run (also, repls)
+       lookup              ; navigate your code and its documentation
+       lsp
+       magit             ; a git porcelain for Emacs
+       make              ; run make tasks from Emacs
+       taskrunner        ; taskrunner for all your projects
+
+       :os
+       tty               ; improve the terminal Emacs experience
+
+       :lang
+       data              ; config/data formats
+       elixir            ; erlang done right
+       emacs-lisp        ; drown in parentheses
+       erlang            ; an elegant language for a more civilized age
+       json              ; At least it ain't XML
+       javascript        ; all(hope(abandon(ye(who(enter(here))))))
+       markdown          ; writing docs for people to ignore
+       org               ; organize your plain life in plain text
+       rest              ; Emacs as a REST client
+       (ruby +rails)     ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
+       sh                ; she sells {ba,z,fi}sh shells on the C xor
+       web               ; the tubes
+       yaml              ; JSON, but readable
+
+       :app
+       calendar
+       emms
+       (rss +org)        ; emacs as an RSS reader
+
+       :config
+       (default +bindings +smartparens))
+#+end_src
+
+
+* Scripts
+
+** SetKBD
+I like to have CapsLock maped to Escape (Esc) bacause of Vim. Also, if I hold CapsLock, it works as another Control key (because Emacs).
+Also, my thinkpad has an US keyboard, which doesn't play nice with portuguese characters.
+#+begin_src sh :tangle ~/.local/bin/setkbd :mkdirp yes
+#!/bin/bash
+
+setxkbmap -layout us -variant altgr-intl -option caps:ctrl_modifier
+xcape -e 'Caps_Lock=Escape;Control_L=Escape;Control_R=Escape'
+
+#+end_src
+
+
+** SetBG
+I often keep the same wallpaper for a year or so. As I already use feh as an image viewer, being able to set a wallpeper with it makes a lot of sense.
+#+begin_src sh :tangle ~/.local/bin/setkbd :mkdirp yes
+#!/bin/bash
+
+feh --bg-scale /home/ulisses/img/wallpaper.jpg
+
+#+end_src
+
+** Docked
+Everytime I dock/undock the thinkpad, I need to tell it which screens to use. There are a lot of ways to automate it, but I really enjoy being able to do it myself.
+#+begin_src sh :tangle ~/.local/bin/docked :mkdirp yes
+#!/bin/sh
+
+xrandr --output LVDS-1 --primary --mode 1366x768 --pos 277x1080 --rotate normal --output VGA-1 --off --output HDMI-1 --off --output DP-1 --off --output HDMI-2 --off --output HDMI-3 --off --output DP-2 --mode 1920x1080 --pos 0x0 --rotate normal --output DP-3 --off
+#+end_src
+
+** Boot
+This piece of crap initializes everything I need
+
+#+begin_src sh :tangle ~/.local/bin/boot :mkdirp yes
+#!/bin/bash
+
+slstatus &
+setkbd
+docked && setbg
+picom &
+#+end_src
+
+** Set scripts up
+Make everything executable
+#+begin_src sh
+chmod +x ~/.local/bin/setkbd
+chmod +x ~/.local/bin/setbg
+chmod +x ~/.local/bin/docked
+chmod +x ~/.local/bin/boot
+#+end_src
+
+
+Make then system accessible
+#+begin_src sh :dir /sudo::
+sudo ln -s $(eval echo ~$USER)/.local/bin/setkbd /usr/local/bin/setkbd
+sudo ln -s $(eval echo ~$USER)/.local/bin/setbd /usr/local/bin/setbg
+sudo ln -s $(eval echo ~$USER)/.local/bin/docked /usr/local/bin/docked
+sudo ln -s $(eval echo ~$USER)/.local/bin/boot /usr/local/bin/boot
+#+end_src
+
+** DWM autostart
+DWM has a patch that allows an autostart script to execute, I just run the boot script, but a lot of stuff could be done here.
+#+begin_src sh :tangle ~/.dwm/autostart.sh :mkdirp yes
+#!/bin/bash
+
+boot
+
+#+end_src
